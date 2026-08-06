@@ -1,6 +1,7 @@
 name: Best Cars CI/CD
 
 on:
+  workflow_dispatch:
   push:
     branches: [main]
   pull_request:
@@ -36,4 +37,3 @@ jobs:
       - name: Build React client
         working-directory: server/frontend
         run: npm run build
-
