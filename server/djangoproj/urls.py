@@ -8,6 +8,11 @@ from djangoapp import views as app_views
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("djangoapp/", include("djangoapp.urls")),
+    path("fetchDealers", app_views.get_dealerships),
+    path("fetchDealers/<str:state>", app_views.get_dealerships),
+    path("fetchDealer/<int:dealer_id>", app_views.get_dealer_details),
+    path("fetchReviews/dealer/<int:dealer_id>", app_views.get_dealer_reviews),
+    path("fetchCars", app_views.get_cars),
     path("", TemplateView.as_view(template_name="Home.html")),
     path("about/", TemplateView.as_view(template_name="About.html")),
     path("contact/", TemplateView.as_view(template_name="Contact.html")),

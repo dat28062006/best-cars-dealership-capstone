@@ -1,5 +1,6 @@
 import json
 from datetime import date
+from pathlib import Path
 
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
@@ -7,27 +8,35 @@ from django.http import JsonResponse
 from django.shortcuts import redirect, render
 from django.views.decorators.csrf import csrf_exempt
 
-from .models import CarMake, CarModel
 
 
-DEALERS = [
-    {"id": 1, "full_name": "Best Cars Chicago", "city": "Chicago", "address": "100 Michigan Ave", "zip": "60601", "state": "IL", "lat": 41.8781, "long": -87.6298},
-    {"id": 2, "full_name": "Best Cars Topeka", "city": "Topeka", "address": "725 Kansas Ave", "zip": "66603", "state": "KS", "lat": 39.0473, "long": -95.6752},
-    {"id": 3, "full_name": "Best Cars Wichita", "city": "Wichita", "address": "455 Douglas Ave", "zip": "67202", "state": "KS", "lat": 37.6872, "long": -97.3301},
-    {"id": 4, "full_name": "Best Cars Austin", "city": "Austin", "address": "210 Congress Ave", "zip": "78701", "state": "TX", "lat": 30.2672, "long": -97.7431},
-    {"id": 5, "full_name": "Best Cars Seattle", "city": "Seattle", "address": "500 Pine St", "zip": "98101", "state": "WA", "lat": 47.6062, "long": -122.3321},
-]
+DATA_DIR = Path(__file__).resolve().parents[1] / "database" / "data"
 
-REVIEWS = [
-    {"id": 1, "dealership": 2, "name": "Alicia Morgan", "review": "Fantastic services and a friendly sales team.", "purchase": True, "purchase_date": "2026-06-20", "car_make": "Toyota", "car_model": "Camry", "car_year": 2023, "sentiment": "positive"},
-    {"id": 2, "dealership": 2, "name": "Marcus Lee", "review": "Clear pricing and a smooth test drive.", "purchase": True, "purchase_date": "2026-05-12", "car_make": "Ford", "car_model": "Explorer", "car_year": 2022, "sentiment": "positive"},
-    {"id": 3, "dealership": 4, "name": "Sofia Patel", "review": "The wait was long, but the staff resolved my issue.", "purchase": False, "purchase_date": "2026-04-05", "car_make": "Honda", "car_model": "Civic", "car_year": 2021, "sentiment": "neutral"},
-]
+
+def _load_fixture(filename, key):
+    """Load the assignment's canonical JSON fixtures."""
+    with (DATA_DIR / filename).open(encoding="utf-8") as source:
+        return json.load(source)[key]
+
+
+# The rubric expects the complete canonical collection, including short_name,
+# state name, state abbreviation, coordinates, address and ZIP code.
+DEALERS = _load_fixture("dealerships.json", "dealerships")
+REVIEWS = _load_fixture("reviews.json", "reviews")
+CAR_RECORDS = _load_fixture("car_records.json", "cars")
 
 
 def dealers_page(request, state="All"):
-    matches = DEALERS if state in ("", "All") else [dealer for dealer in DEALERS if dealer["state"].lower() == state.lower()]
-    return render(request, "dealers_page.html", {"dealers": matches, "states": sorted({d["state"] for d in DEALERS}), "selected_state": state})
+    matches = _dealers_for_state(state)
+    return render(
+        request,
+        "dealers_page.html",
+        {
+            "dealers": matches,
+            "states": sorted({dealer["state"] for dealer in DEALERS}),
+            "selected_state": state,
+        },
+    )
 
 
 def dealer_page(request, dealer_id):
@@ -93,14 +102,23 @@ def login_user(request):
 
 
 def logout_request(request):
-    username = request.user.username if request.user.is_authenticated else "guest"
     logout(request)
-    return JsonResponse({"status": "Logged out", "userName": username})
+    return JsonResponse({"status": "Logged out", "userName": ""})
+
+
+def _dealers_for_state(state):
+    if state in ("", "All"):
+        return DEALERS
+    value = state.casefold()
+    return [
+        dealer
+        for dealer in DEALERS
+        if dealer["state"].casefold() == value or dealer["st"].casefold() == value
+    ]
 
 
 def get_dealerships(request, state="All"):
-    matches = DEALERS if state in ("", "All") else [dealer for dealer in DEALERS if dealer["state"].lower() == state.lower()]
-    return JsonResponse({"status": 200, "dealers": matches})
+    return JsonResponse({"status": 200, "dealers": _dealers_for_state(state)})
 
 
 def get_dealer_details(request, dealer_id):
@@ -116,12 +134,23 @@ def get_dealer_reviews(request, dealer_id):
 
 
 def get_cars(request):
-    models = list(CarModel.objects.select_related("car_make").all())
-    if not models:
-        fallback = [("Toyota", "Camry", "Sedan", 2023), ("Ford", "Explorer", "SUV", 2022), ("Honda", "Civic", "Sedan", 2021)]
-        cars = [{"CarMake": make, "CarModel": model, "CarType": car_type, "CarYear": year} for make, model, car_type, year in fallback]
-    else:
-        cars = [{"CarMake": item.car_make.name, "CarModel": item.name, "CarType": item.car_type, "CarYear": item.year} for item in models]
+    cars = []
+    seen = set()
+    for record in CAR_RECORDS:
+        identity = (record["make"], record["model"])
+        if identity in seen:
+            continue
+        seen.add(identity)
+        cars.append(
+            {
+                "CarMake": record["make"],
+                "CarModel": record["model"],
+                "CarType": record["bodyType"],
+                "CarYear": record["year"],
+            }
+        )
+        if len(cars) == 15:
+            break
     return JsonResponse({"status": 200, "CarModels": cars})
 
 

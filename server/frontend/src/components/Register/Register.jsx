@@ -35,11 +35,11 @@ const Register = () => {
     <div><Header /><form className="register_container" onSubmit={register}>
       <h1 className="header">Create account</h1>
       <div className="inputs">
-        <label className="input"><img src={personIcon} className="img_icon" alt="" /><input className="input_field" aria-label="Username" placeholder="Username" value={userName} onChange={(e) => setUserName(e.target.value)} required /></label>
-        <label className="input"><img src={personIcon} className="img_icon" alt="" /><input className="input_field" aria-label="First Name" placeholder="First Name" value={firstName} onChange={(e) => setFirstName(e.target.value)} required /></label>
-        <label className="input"><img src={personIcon} className="img_icon" alt="" /><input className="input_field" aria-label="Last Name" placeholder="Last Name" value={lastName} onChange={(e) => setLastName(e.target.value)} required /></label>
-        <label className="input"><img src={emailIcon} className="img_icon" alt="" /><input className="input_field" type="email" aria-label="Email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required /></label>
-        <label className="input"><img src={passwordIcon} className="img_icon" alt="" /><input className="input_field" type="password" aria-label="Password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} required /></label>
+        <label className="input" htmlFor="username"><img src={personIcon} className="img_icon" alt="" /><input id="username" name="userName" className="input_field" aria-label="Username" placeholder="Username" value={userName} onChange={(e) => setUserName(e.target.value)} required /></label>
+        <label className="input" htmlFor="firstname"><img src={personIcon} className="img_icon" alt="" /><input id="firstname" name="firstName" className="input_field" aria-label="First Name" placeholder="First Name" value={firstName} onChange={(e) => setFirstName(e.target.value)} required /></label>
+        <label className="input" htmlFor="lastname"><img src={personIcon} className="img_icon" alt="" /><input id="lastname" name="lastName" className="input_field" aria-label="Last Name" placeholder="Last Name" value={lastName} onChange={(e) => setLastName(e.target.value)} required /></label>
+        <label className="input" htmlFor="email"><img src={emailIcon} className="img_icon" alt="" /><input id="email" name="email" className="input_field" type="email" aria-label="Email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required /></label>
+        <label className="input" htmlFor="password"><img src={passwordIcon} className="img_icon" alt="" /><input id="password" name="password" className="input_field" type="password" aria-label="Password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} required /></label>
       </div>
       <div className="submit_panel"><button className="submit" type="submit">Register</button></div>
     </form></div>
@@ -47,4 +47,3 @@ const Register = () => {
 };
 
 export default Register;
-

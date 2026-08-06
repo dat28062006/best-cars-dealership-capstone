@@ -1,16 +1,16 @@
-# Best Cars Dealership Review Portal
+# Full Stack Application Development Capstone Project
 
-Best Cars is a full-stack Django and React capstone application for browsing
-dealerships across the United States, filtering branches by state, reading
-customer reviews, and posting authenticated reviews with sentiment analysis.
+## Repository name
+
+`best-cars-dealership-capstone`
 
 ## Project name
 
 **Best Cars Dealership Review Portal**
 
-## Repository
-
-`best-cars-dealership-capstone`
+Best Cars is a full-stack Django and React capstone application for browsing
+dealerships across the United States, filtering branches by state, reading
+customer reviews, and posting authenticated reviews with sentiment analysis.
 
 ## Run locally
 
@@ -25,4 +25,3 @@ python server/manage.py runserver
 ```
 
 The site is then available at `http://127.0.0.1:8000/`.
-
