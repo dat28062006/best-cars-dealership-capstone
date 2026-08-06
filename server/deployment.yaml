@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: best-cars-dealership
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: best-cars-dealership
+  template:
+    metadata:
+      labels:
+        app: best-cars-dealership
+    spec:
+      containers:
+        - name: web
+          image: best-cars-dealership:latest
+          ports:
+            - containerPort: 8000
+          readinessProbe:
+            httpGet:
+              path: /djangoapp/get_dealers
+              port: 8000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: best-cars-dealership
+spec:
+  selector:
+    app: best-cars-dealership
+  ports:
+    - port: 80
+      targetPort: 8000
+

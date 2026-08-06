@@ -28,10 +28,12 @@ const Login = ({ onClose }) => {
     const json = await res.json();
     if (json.status != null && json.status === "Authenticated") {
         sessionStorage.setItem('username', json.userName);
+        sessionStorage.setItem('firstname', json.firstName || '');
+        sessionStorage.setItem('lastname', json.lastName || '');
         setOpen(false);        
     }
     else {
-      alert("The user could not be authenticated.")
+      alert(json.message || "The user could not be authenticated.")
     }
 };
 
